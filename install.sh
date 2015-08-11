@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Store location of installer script to reference config files
+instdir=$PWD
+
 # Move to /usr/share to download/install the ELK Stack
 cd /usr/share
 
@@ -50,13 +53,15 @@ if [[ `echo $OSTYPE | egrep "([.*x]$)"` != "" ]]; then
 	# For 64 Bit Linux Distros uncomment the line below:
 	curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x64.tar.gz 
 	tar xvfz kibana-4.1.1-linux-x64.tar.gz
-	chown -R $theuser /usr/share/kibana-4.1.1-linux-x86
+	chown -R $theuser /usr/share/kibana-4.1.1-linux-x64
+	chmod -R a+rwx /usr/share/kibana-4.1.1-linux-x64
 	ln -s /usr/share/kibana-4.1.1-linux-x64 /usr/share/kibana &
     else 
 	# For 32 Bit Linux Distros uncomment the line below:
 	curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x86.tar.gz 
 	tar xvfz kibana-4.1.1-linux-x86.tar.gz 
 	chown -R $theuser /usr/share/kibana-4.1.1-linux-x86
+	chmod -R a+rwx /usr/share/kibana-4.1.1-linux-x86
 	ln -s /usr/share/kibana-4.1.1-linux-x86 /usr/share/kibana &
     fi
 else
@@ -64,6 +69,7 @@ else
     curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-darwin-x64.tar.gz
     tar xvfz kibana-4.1.1-darwin-x64.tar.gz
     chown -R $theuser /usr/share/kibana-4.1.1-darwin-x64
+    chmod -R a+rwx /usr/share/kibana-4.1.1-darwin-x64
     ln -s /usr/share/kibana-4.1.1-darwin-x64 /usr/share/kibana
 fi
 
@@ -73,10 +79,12 @@ tar xvfz logstash-1.5.2.tar.gz
 
 # Then give yourself ownership/permissions on these directories
 # On OSX if your username is billy and you have admin permissions it might look like
-chown -R $theuser /usr/share/{elasticsearch-1.5.2,logstash-1.5.2}
+chown -R $theuser /usr/share/elasticsearch-1.5.2
+chown -R $theuser /usr/share/logstash-1.5.2
 
 # Give read/write/execute permissions to anyone with access to this system
-chmod -R a+rwx /usr/share/{elasticsearch-1.5.2,logstash-1.5.2}
+chmod -R a+rwx /usr/share/elasticsearch-1.5.2
+chmod -R a+rwx /usr/share/logstash-1.5.2
 
 # Install the Elasticsearch csv plugin
 mkdir -p /usr/share/elasticsearch-1.5.2/{plugins,work,tmp,data}
@@ -642,6 +650,10 @@ fi
 # Move back into main installation directory
 cd ../
 
+rm elasticsearch/config/elasticsearch.yml elasticsearch/config/logging.yml
+cp ${instdir}/elasticsearch.yml elasticsearch/config/elasticsearch.yml
+cp ${instdir}/logging.yml elasticsearch/config/logging.yml
+chmod -R a+rx elasticsearch/config
 
 # Now spin up the elasticsearch server
 elasticsearch/bin/elasticsearch -d &
@@ -651,7 +663,7 @@ elasticsearch/bin/elasticsearch -d &
 echo 'input {
 tcp {
 mode => "server"
-host => "192.168.1.1"
+host => "192.168.1.3"
 port => 6983
 codec => "json"
 }
@@ -859,7 +871,7 @@ echo "logstash/bin/plugin install logstash-output-zabbix"
 echo "logstash/bin/plugin install logstash-output-zeromq"
 
 # Start up logstash
-#logstash/bin/logstash agent -f logstash/injson-outelasticsearch.conf &
+logstash/bin/logstash -f logstash/injson-outelasticsearch.conf &
 
 echo "To start logstash, use the command:"
 echo "/usr/share/logstash/bin/logstash -f [config file path/name] & "
@@ -881,10 +893,14 @@ done
 
 # Then give yourself ownership/permissions on these directories
 # On OSX if your username is billy and you have admin permissions it might look like
-chown -R $theuser /usr/share/{elasticsearch,logstash,kibana}
+chown -R $theuser /usr/share/elasticsearch
+chown -R $theuser /usr/share/logstash
+chown -R $theuser /usr/share/kibana
 
 # Give read/write/execute permissions to anyone with access to this system
-chmod -R a+rwx /usr/share/{elasticsearch,logstash,kibana}
+chmod -R a+rwx /usr/share/elasticsearch
+chmod -R a+rwx /usr/share/logstash
+chmod -R a+rwx /usr/share/kibana
 
 # Create commands to launch
 ln -s /usr/share/elasticsearchbin/elasticsearch /usr/bin/elasticsearch
