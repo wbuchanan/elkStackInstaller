@@ -12,7 +12,8 @@ mkdir elkArchive
 if [ "$(whoami)" == "root" ]; then
 	# Get the end user's username
 	echo "What is your username on this system?"
-	read -s theuser
+	read theuser
+	echo "Hi, $theuser.  I'll help you set up the ELK Stack - Elasticsearch, Logstash, and Kibana.  I'll just need you to answer a few simple questions with either a y for yes or n for no."
 	echo "Which version of ElasticSearch would you like to install?"
 	read elasticsearchVersion
 	echo "Which version of Logstash would you like to install?"
@@ -59,13 +60,15 @@ if [[ `echo $OSTYPE | egrep "([.*x]$)"` != "" ]]; then
 	# For 64 Bit Linux Distros uncomment the line below:
 	curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-linux-x64.tar.gz 
 	tar xvfz kibana-${kibanaVersion}-linux-x64.tar.gz
-	chown -R $theuser /usr/share/kibana-${kibanaVersion}-linux-x86
+	chown -R $theuser /usr/share/kibana-${kibanaVersion}-linux-x64
+	chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-linux-x64
 	ln -s /usr/share/kibana-${kibanaVersion}-linux-x64 /usr/share/kibana &
     else 
 	# For 32 Bit Linux Distros uncomment the line below:
 	curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-linux-x86.tar.gz 
 	tar xvfz kibana-${kibanaVersion}-linux-x86.tar.gz 
 	chown -R $theuser /usr/share/kibana-${kibanaVersion}-linux-x86
+	chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-linux-x86
 	ln -s /usr/share/kibana-${kibanaVersion}-linux-x86 /usr/share/kibana &
     fi
 else
@@ -73,6 +76,7 @@ else
     curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-darwin-x64.tar.gz
     tar xvfz kibana-${kibanaVersion}-darwin-x64.tar.gz
     chown -R $theuser /usr/share/kibana-${kibanaVersion}-darwin-x64
+    chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-darwin-x64
     ln -s /usr/share/kibana-${kibanaVersion}-darwin-x64 /usr/share/kibana
 fi
 
@@ -82,10 +86,12 @@ tar xvfz logstash-${logstashVersion}.tar.gz
 
 # Then give yourself ownership/permissions on these directories
 # On OSX if your username is billy and you have admin permissions it might look like
-chown -R $theuser /usr/share/{elasticsearch-${elasticsearchVersion},logstash-${logstashVersion}}
+chown -R $theuser /usr/share/elasticsearch-${elasticsearchVersion}
+chown -R $theuser /usr/share/logstash-${logstashVersion}
 
 # Give read/write/execute permissions to anyone with access to this system
-chmod -R a+rwx /usr/share/{elasticsearch-${elasticsearchVersion},logstash-${logstashVersion}}
+chmod -R o+rwx /usr/share/elasticsearch-${elasticsearchVersion}
+chmod -R o+rwx /usr/share/logstash-${logstashVersion}
 
 # Install the Elasticsearch csv plugin
 mkdir -p /usr/share/elasticsearch-${elasticsearchVersion}/{plugins,work,tmp,data}
@@ -95,8 +101,12 @@ ln -s /usr/share/elasticsearch-${elasticsearchVersion} /usr/share/elasticsearch
 ln -s /usr/share/logstash-${logstashVersion} /usr/share/logstash
 
 # Change file permissions for symlinked directories
-chown -R $theuser /usr/share/{elasticsearch,logstash,kibana}
-chmod -R +rwx /usr/share/{elasticsearch,logstash,kibana}
+chown -R $theuser /usr/share/elasticsearch
+chown -R $theuser /usr/share/logstash
+chown -R $theuser /usr/share/kibana
+chmod -R o+rwx /usr/share/elasticsearch
+chmod -R o+rwx /usr/share/logstash
+chmod -R o+rwx /usr/share/kibana
 
 # Move into Elasticsearch root directory
 cd /usr/share/elasticsearch
