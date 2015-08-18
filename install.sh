@@ -57,28 +57,6 @@ curl -O http://download.elastic.co/logstash/logstash/logstash-${logstashVersion}
 if [[ `echo $OSTYPE | egrep "([.*x]$)"` != "" ]]; then
     if [[ `uname -m` == "x86_64" ]]; then 
 	# For 64 Bit Linux Distros uncomment the line below:
-<<<<<<< HEAD
-	curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x64.tar.gz 
-	tar xvfz kibana-4.1.1-linux-x64.tar.gz
-	chown -R $theuser /usr/share/kibana-4.1.1-linux-x64
-	chmod -R a+rwx /usr/share/kibana-4.1.1-linux-x64
-	ln -s /usr/share/kibana-4.1.1-linux-x64 /usr/share/kibana &
-    else 
-	# For 32 Bit Linux Distros uncomment the line below:
-	curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x86.tar.gz 
-	tar xvfz kibana-4.1.1-linux-x86.tar.gz 
-	chown -R $theuser /usr/share/kibana-4.1.1-linux-x86
-	chmod -R a+rwx /usr/share/kibana-4.1.1-linux-x86
-	ln -s /usr/share/kibana-4.1.1-linux-x86 /usr/share/kibana &
-    fi
-else
-    # Install the Mac OSX compatible Kibana
-    curl -O https://download.elastic.co/kibana/kibana/kibana-4.1.1-darwin-x64.tar.gz
-    tar xvfz kibana-4.1.1-darwin-x64.tar.gz
-    chown -R $theuser /usr/share/kibana-4.1.1-darwin-x64
-    chmod -R a+rwx /usr/share/kibana-4.1.1-darwin-x64
-    ln -s /usr/share/kibana-4.1.1-darwin-x64 /usr/share/kibana
-=======
 	curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-linux-x64.tar.gz 
 	tar xvfz kibana-${kibanaVersion}-linux-x64.tar.gz
 	chown -R $theuser /usr/share/kibana-${kibanaVersion}-linux-x86
@@ -96,7 +74,6 @@ else
     tar xvfz kibana-${kibanaVersion}-darwin-x64.tar.gz
     chown -R $theuser /usr/share/kibana-${kibanaVersion}-darwin-x64
     ln -s /usr/share/kibana-${kibanaVersion}-darwin-x64 /usr/share/kibana
->>>>>>> dcae16a1a8acd7e83f7fe4496425cab42d475ed9
 fi
 
 # Untar/Decompress each of the files
@@ -105,19 +82,10 @@ tar xvfz logstash-${logstashVersion}.tar.gz
 
 # Then give yourself ownership/permissions on these directories
 # On OSX if your username is billy and you have admin permissions it might look like
-<<<<<<< HEAD
-chown -R $theuser /usr/share/elasticsearch-1.5.2
-chown -R $theuser /usr/share/logstash-1.5.2
-
-# Give read/write/execute permissions to anyone with access to this system
-chmod -R a+rwx /usr/share/elasticsearch-1.5.2
-chmod -R a+rwx /usr/share/logstash-1.5.2
-=======
 chown -R $theuser /usr/share/{elasticsearch-${elasticsearchVersion},logstash-${logstashVersion}}
 
 # Give read/write/execute permissions to anyone with access to this system
 chmod -R a+rwx /usr/share/{elasticsearch-${elasticsearchVersion},logstash-${logstashVersion}}
->>>>>>> dcae16a1a8acd7e83f7fe4496425cab42d475ed9
 
 # Install the Elasticsearch csv plugin
 mkdir -p /usr/share/elasticsearch-${elasticsearchVersion}/{plugins,work,tmp,data}
