@@ -685,11 +685,11 @@ source => "message"
 output {
 elasticsearch {
 embedded => false
-host => "127.0.0.1"
-port => "9300"
-protocol => "node"
+host => "localhost"
+port => "9200"
+protocol => "http"
 cluster => "sdpDemo"
-index => "logstash-%{+YYYY.MM.dd}"
+index => "R-Shiny-Application"
 }
 }' >> logstash/injson-outelasticsearch.conf
 
