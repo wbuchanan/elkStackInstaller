@@ -689,7 +689,7 @@ host => "localhost"
 port => "9200"
 protocol => "http"
 cluster => "sdpDemo"
-index => "R-Shiny-Application"
+index => "logstash-%{+YYYY.MM.dd}"
 }
 }' >> logstash/injson-outelasticsearch.conf
 
