@@ -62,14 +62,14 @@ if [[ `echo $OSTYPE | egrep "([.*x]$)"` != "" ]]; then
 	curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-linux-x64.tar.gz 
 	tar xvfz kibana-${kibanaVersion}-linux-x64.tar.gz
 	chown -R $theuser:$userGroup /usr/share/kibana-${kibanaVersion}-linux-x64
-	chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-linux-x64
+	chmod -R a+rwx /usr/share/kibana-${kibanaVersion}-linux-x64
 	ln -s /usr/share/kibana-${kibanaVersion}-linux-x64 /usr/share/kibana &
     else 
 	# For 32 Bit Linux Distros uncomment the line below:
 	curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-linux-x86.tar.gz 
 	tar xvfz kibana-${kibanaVersion}-linux-x86.tar.gz 
 	chown -R $theuser:$userGroup /usr/share/kibana-${kibanaVersion}-linux-x86
-	chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-linux-x86
+	chmod -R a+rwx /usr/share/kibana-${kibanaVersion}-linux-x86
 	ln -s /usr/share/kibana-${kibanaVersion}-linux-x86 /usr/share/kibana &
     fi
 else
@@ -77,7 +77,7 @@ else
     curl -O https://download.elastic.co/kibana/kibana/kibana-${kibanaVersion}-darwin-x64.tar.gz
     tar xvfz kibana-${kibanaVersion}-darwin-x64.tar.gz
     chown -R $theuser:$userGroup /usr/share/kibana-${kibanaVersion}-darwin-x64
-    chmod -R o+rwx /usr/share/kibana-${kibanaVersion}-darwin-x64
+    chmod -R a+rwx /usr/share/kibana-${kibanaVersion}-darwin-x64
     ln -s /usr/share/kibana-${kibanaVersion}-darwin-x64 /usr/share/kibana
 fi
 
@@ -91,8 +91,8 @@ chown -R $theuser:$userGroup /usr/share/logstash-$logstashVersion
 chown -R $theuser:$userGroup /usr/share/elasticsearch-$elasticsearchVersion
 
 # Give read/write/execute permissions to anyone with access to this system
-chmod -R o+rwx /usr/share/elasticsearch-$elasticsearchVersion
-chmod -R o+rwx /usr/share/logstash-$logstashVersion
+chmod -R a+rwx /usr/share/elasticsearch-$elasticsearchVersion
+chmod -R a+rwx /usr/share/logstash-$logstashVersion
 
 # Install the Elasticsearch csv plugin
 mkdir -p /usr/share/elasticsearch-${elasticsearchVersion}/{plugins,work,tmp,data}
@@ -105,9 +105,9 @@ ln -s /usr/share/logstash-${logstashVersion} /usr/share/logstash
 chown -R $theuser:$userGroup /usr/share/elasticsearch
 chown -R $theuser:$userGroup /usr/share/logstash
 chown -R $theuser:$userGroup /usr/share/kibana
-chmod -R o+rwx /usr/share/elasticsearch
-chmod -R o+rwx /usr/share/logstash
-chmod -R o+rwx /usr/share/kibana
+chmod -R a+rwx /usr/share/elasticsearch
+chmod -R a+rwx /usr/share/logstash
+chmod -R a+rwx /usr/share/kibana
 
 # Move into Elasticsearch root directory
 cd /usr/share/elasticsearch
@@ -667,31 +667,6 @@ cp ${instdir}/elasticsearch.yml elasticsearch/config/elasticsearch.yml
 cp ${instdir}/logging.yml elasticsearch/config/logging.yml
 chmod -R a+rx elasticsearch/config
 
-# This will print the configuration file I set up to pipe the output from R into
-# Logstash and should save it to a file in the logstash directory
-echo 'input {
-tcp {
-mode => "server"
-host => "192.168.1.1"
-port => 6983
-codec => "json"
-}
-}
-filter {
-json {
-source => "message"
-}
-}
-output {
-elasticsearch {
-embedded => false
-host => "localhost"
-port => "9200"
-protocol => "http"
-cluster => "sdpDemo"
-index => "logstash-%{+YYYY.MM.dd}"
-}
-}' >> logstash/injson-outelasticsearch.conf
 
 echo "The next command prints all installed Logstash plugins to the console for your convenience."
 
@@ -880,29 +855,26 @@ echo "logstash/bin/plugin install logstash-output-websocket"
 echo "logstash/bin/plugin install logstash-output-xmpp"
 echo "logstash/bin/plugin install logstash-output-zabbix"
 echo "logstash/bin/plugin install logstash-output-zeromq"
-
-
-# Check if this is Billy's MacBook for the demo
-if [[ ("$OSTYPE" == "darwin14") || ("$theuser" == "billy") ]]; then
-
-    # If it is Billy's MacBook switch to the network profile for the demo
-    networksetup -switchtolocation sdpdemo
-
-    # Then turn off WiFi to prevent any issues with DNS servers from the WiFi network
-    networksetup -setairportpower en0 off
-    
-fi
-
-# Now spin up the elasticsearch server
-/usr/share/elasticsearch/bin/elasticsearch -d &
-
-# Start up logstash
-/usr/share/logstash/bin/logstash -f logstash/injson-outelasticsearch.conf &
-
-echo "To start logstash, use the command:"
+echo ""
+echo ""
+echo ""
+echo ""
+echo "Now I'll print the commands you can use to spin up the different servers."
+echo ""
+echo ""
+echo "To start elasticsearch, you can use the command: "
+echo "/usr/share/elasticsearch/bin/elasticsearch -d & "
+echo ""
+echo ""
+echo "To start logstash, you can use the command:"
 echo "/usr/share/logstash/bin/logstash -f [config file path/name] & "
 echo "Substituting [config file path/name] for the name of your logstash configuration file"
-
+echo ""
+echo ""
+echo "To start up Kibana, you can use the command:"
+echo "/usr/share/kibana/bin/kibana -q &"
+echo ""
+echo ""
 
 # Now start up Kibana
 /usr/share/kibana/bin/kibana -q &
@@ -923,7 +895,8 @@ chown -R $theuser:$userGroup /usr/share/elasticsearch
 chown -R $theuser:$userGroup /usr/share/logstash
 chown -R $theuser:$userGroup /usr/share/kibana
 
-# Give read/write/execute permissions to you
+# Give read/write/execute permissions to all users on the system.
+# You should change these permissions before putting things into production.
 chmod -R o+rwx /usr/share/elasticsearch
 chmod -R o+rwx /usr/share/logstash
 chmod -R o+rwx /usr/share/kibana
