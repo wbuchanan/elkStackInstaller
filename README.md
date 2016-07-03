@@ -1,5 +1,7 @@
 # ELK Stack Installer Script
 
+Script will be updated shortly to use `homebrew` to build the majority of the Stack for OSX operating systems.  I no longer have access to any Linux based machines, so it may take a while for me to find any easy solution to use for these purposes in the meantime.  
+
 ## Instructions
 You can copy/paste the script install.sh from here, or you can use:
 
